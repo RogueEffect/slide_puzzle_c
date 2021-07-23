@@ -1,0 +1,35 @@
+
+Problem 1
+
+How can we print the board to a console?
+
+
+
+One idea is to simply print the 2d grid of characters.
+
+  ABCD
+  EFGH
+  IJKL
+  MNO 
+
+This solution is simple and could be nice for playing on smaller consoles.
+
+
+
+A slightly nicer looking interface would include a grid made of - and | chars.
+
+  ---------
+  |A|B|C|D|
+  ---------
+  |E|F|G|H|
+  ---------
+  |I|J|K|L|
+  ---------
+  |M|N|O| |
+  ---------
+  
+This is a slightly more complex idea, but could help the user identify the
+spacer tile when on the edge of the board. It also looks nicer.
+
+For now let's create an array to hold the chars representing the tiles and a
+function to print it to the screen.
