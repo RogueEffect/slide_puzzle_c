@@ -26,12 +26,12 @@ A simple way to handle a move would be to keep track of the spacer tile and do
 
 If you have the x and y location of the spacer tile you can find the following
   adjacent tiles with some simple arithmatic
-  
-  The tile above the space will be at (x, y - 1)
-  The tile below will be at (x, y + 1)
-  Left is (x - 1, y)
-  and right is (x + 1, y)
-  
+
+The tile above the space will be at (x, y - 1)\
+The tile below will be at (x, y + 1)\
+Left is (x - 1, y)\
+and right is (x + 1, y)
+
 These four moves should be the only valid moves in the game (assuming we dont try
   moving the space out of the board). An easy way to avoid going out of bounds
   would be to check that the position of the adjacent tile is 0 <= x < width
