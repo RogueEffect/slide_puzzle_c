@@ -9,10 +9,12 @@ On a physical slide puzzle we can slide a tile into the space. In a digital
 
 Consider the move below where we start with the solved board and swap L and space
 
+```
   ABCD    ABCD
   EFGH -> EFGH
   IJKL    IJK 
   MNO     MNOL
+```
 
 Actually swapping tiles should be trivial, however we have to consider if a move
   is valid or not beforehand. Another thing to consider is how can we find out
