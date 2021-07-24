@@ -10,30 +10,44 @@ rogueeffect
 */
 
 #include <stdio.h>
-#include <string.h> // We need this for memset and later memcpy
+#include <string.h> 
 
-
-// Let's define some constants
-#define WIDTH   4 // These two for the board width and height
-#define HEIGHT  4 // We may want to have larger boards later
-#define SQUARE_SIZE     2 // This will be how wide and tall we draw the tiles
-// These constants will be the actual size of the board when drawn
+#define WIDTH   4
+#define HEIGHT  4
+#define SQUARE_SIZE     2
 #define BOARD_WIDTH     (SQUARE_SIZE * WIDTH + 1)
 #define BOARD_HEIGHT    (SQUARE_SIZE * HEIGHT + 1)
-#define INDENT  4 // Indent when drawing the board
+#define INDENT  4 
 
-// We can use the constants here now
 char    tiles[WIDTH * HEIGHT];
+// This can be the index of the space tile
+int     space;
 
 void    init();
 void    draw_board();
+void    swap(int, int);
+int     handle_move(int, int);
 
 
 
 int main(int argc, char** argv) {
-    printf("Testing print function... again\n");
+    printf("Testing moving tiles...\n");
     init();
     draw_board();
+    // Here we can test our new functions (check the definitions at the end)
+    handle_move(0, -1); // move space up
+    draw_board();
+    handle_move(-1, 0); // move space left twice
+    handle_move(-1, 0);
+    draw_board();
+    handle_move(0, 1); // move space down
+    draw_board();
+    handle_move(1, 0); // move space right
+    draw_board();
+    // Let's test if invalid moves do anything
+    if(!handle_move(0, 1)) {
+        printf("Invalid move!\n");
+    }
     
     printf("done.\n");
 }
@@ -41,72 +55,70 @@ int main(int argc, char** argv) {
 
 
 void init() {
-    // Use the constants here as well
     for(int i = 0; i < WIDTH * HEIGHT - 1; i++) {
         char c = 'A' + i;
         tiles[i] = c;
     }
-    tiles[WIDTH * HEIGHT - 1] = ' ';
+    
+    // Set the location of the space tile (move handling will rely on this)
+    space = WIDTH * HEIGHT - 1;
+    tiles[space] = ' ';
 }
 
 void draw_board() {
-    // With larger boards many calls to printf or putc will slow down our draw
-    //   function too much. Let's use a char buffer per line to reduce prints
     printf("\n");
     for(int y = 0; y < BOARD_HEIGHT; y++) {
-        // The buffer will need to be the board width + 1 for the null
         char buffer[BOARD_WIDTH + 1];
         for(int x = 0; x < BOARD_WIDTH; x++) {
-            char c = ' '; // Empty space if square size is more than 2
-            // Time for more math
-            if(y % SQUARE_SIZE == 0) c = '-'; // Horizontal tile separators
-            else if(x % SQUARE_SIZE == 0) c = '|'; // Vertical separators
-            // This will place the tile letter on the top left of its tile
-            //   Later we can do some math to center it in it's tile
+            char c = ' ';
+            if(y % SQUARE_SIZE == 0) c = '-';
+            else if(x % SQUARE_SIZE == 0) c = '|';
             if(x % SQUARE_SIZE == 1 && y % SQUARE_SIZE == 1) {
-                // To get the proper x and y for tiles array we can just divide
-                //   by square size
                 int tx = x / SQUARE_SIZE;
                 int ty = y / SQUARE_SIZE;
-                // Take care not to use board width or you'll go out of bounds
                 c = tiles[tx + ty * WIDTH];
             }
-            // Write the char to the buffer
             buffer[x] = c;
         }
-        // Add a null terminator
         buffer[BOARD_WIDTH] = '\0';
-        // A small buffer for the indent
         char indent[INDENT + 1];
-        // Set all chars to spaces
         memset(indent, ' ', INDENT);
-        // Null
         indent[INDENT] = '\0';
-        // Print the indent immediately followed by the board buffer
         printf("%s%s\n", indent, buffer);
     }
     printf("\n");
 }
 
+// This function swaps 2 tiles given their indices
+void swap(int a, int b) {
+    char temp = tiles[a];
+    tiles[a] = tiles[b];
+    tiles[b] = temp;
+}
 
-// Now our board looks a bit better, you can even change the board size and 
-//   square size to see what larger boards would look like
-// Because larger boards would mean more print statements, this is still not the
-//   the most optimal way to print the board
-// We could make one large buffer to contain the whole board and indents then
-//   print it all at once to speed it up a bit
-//
-// If you're having trouble understanding the math involved with drawing the
-// board, maybe this figure will help you (Assume board is 4x4 and square is 2)
-//
-//  0123456789 X Each row is a buffer 10 long (remember we need nulls)
-// 0---------\0  Meanwhile our outer loop goes for 9 iterations
-// 1| | | | |\0  Inside the two loops our first if statement deals with
-// 2---------\0    whether or not y is on a row where we want horizontal
-// 3| | | | |\0    seperators (y % SQUARE_SIZE == 0) so every other row
-// 4---------\0    is filled with - chars
-// 5| | | | |\0  The if-else statement only happens when the previous if is
-// 6---------\0    not true. Here every other char is | and if it was not
-// 7| | | | |\0    changed, we add a space instead
-// 8---------\0  Then if x and y is the first space inside a tile, we grab
-// Y               the appropriate char from the tiles array
+// Here we take in 2 values representing the delta in x and y directions
+// Each of the four moves provides one non-zero value and one zero value but
+//   never two non-zeros, or two zeros (that wouldnt even move anything)
+int handle_move(int dx, int dy) {
+    // Let's assume we will always used this function properly and leave out any
+    //   sanity checks about diagonal or useless moves
+    int x = space % WIDTH; // Again some math because im using 1d array
+    int y = space / WIDTH;
+    dx += x;
+    dy += y;
+    // Let's check that the target x location is valid
+    if(dx < 0 || dx >= WIDTH) return 0; // The move failed, warn the user
+    // Now the y location
+    if(dy < 0 || dy >= HEIGHT) return 0;
+    // If we get here the move is valid and we can perform the swap
+    swap(space, dx + dy * WIDTH);
+    // Then update where the space is
+    space = dx + dy * WIDTH;
+    // Later we can implement move counting here
+    return 1; // Move succeeded
+}
+
+// Remember handle move will always take one zero value and one non-zero (1, -1)
+//   otherwise the space will make movements that could break the puzzle
+// Next we'll have to map the four moves to something the user can type into
+//   the console. (Probably WASD since arrow keys cannot be sent to stdin)

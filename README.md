@@ -1,42 +1,4 @@
 
-Problem 1
-    commits [
-        e97ba9c21651a40a91715f83697e3f5c043ae1ed,
-        7861e438793e73cce69af22aa53db2f0289884c8
-    ]
-
-How can we print the board to a console?
-
-
-
-One idea is to simply print the 2d grid of characters.
-
-  ABCD
-  EFGH
-  IJKL
-  MNO 
-
-This solution is simple and could be nice for playing on smaller consoles.
-
-
-
-A slightly nicer looking interface would include a grid made of - and | chars.
-
-  ---------
-  |A|B|C|D|
-  ---------
-  |E|F|G|H|
-  ---------
-  |I|J|K|L|
-  ---------
-  |M|N|O| |
-  ---------
-  
-This is a slightly more complex idea, but could help the user identify the
-spacer tile when on the edge of the board. It also looks nicer.
-
-
-
 Problem 2
 
 How can we handle moves?
